@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Market Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Stock Market Predictor</h1>
+        
+       
+<form method="POST">
+    <div class="form-group">
+        <label for="stock">Stock Symbol:</label>
+        <input type="text" id="stock" name="stock" 
+               value="{{ request.form.stock if request.form.stock else 'AAPL' }}" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" 
+               value="{{ request.form.start_date if request.form.start_date else '2012-01-01' }}" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" 
+               value="{{ request.form.end_date if request.form.end_date else '2024-12-31' }}" required>
+    </div>
+    
+    <button type="submit">Analyze & Predict</button>
+</form>
+
+        
+        {% if prediction %}
+            {% if prediction.error %}
+                <div class="error">{{ prediction.error }}</div>
+            {% else %}
+                <div class="results">
+                    <h2>{{ prediction.stock }} Analysis ({{ prediction.start_date }} to {{ prediction.end_date }})</h2>
+                    
+                    <h3>Recent Data</h3>
+                    <div class="data-table">
+                        {{ prediction.data|safe }}
+                    </div>
+                    
+                    <div class="plots">
+                        <h3>Technical Analysis</h3>
+                        <div class="plot">
+                            <img src="data:image/png;base64,{{ plots.ma50 }}" alt="Price vs MA50">
+                        </div>
+                        <div class="plot">
+                            <img src="data:image/png;base64,{{ plots.ma100 }}" alt="Price vs MA100">
+                        </div>
+                        <div class="plot">
+                            <img src="data:image/png;base64,{{ plots.ma200 }}" alt="Price vs MA200">
+                        </div>
+                        
+                        <h3>Prediction Results</h3>
+                        <div class="plot">
+                            <img src="data:image/png;base64,{{ plots.prediction }}" alt="Prediction vs Actual">
+                        </div>
+                        
+                        <div class="predictions">
+                            <h4>Latest Predictions:</h4>
+                            <ul>
+                                {% for pred in prediction.predictions %}
+                                <li>${{ "%.2f"|format(pred) }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
